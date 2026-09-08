@@ -4,7 +4,7 @@ Spec: https://github.com/salesforce/ja3
 JA3  = MD5("TLSVersion,Ciphers,Extensions,Curves,PointFormats")
 JA3S = MD5("TLSVersion,Cipher,Extensions")
 
-GREASE values (RFC 8701) are excluded from cipher/extension/curve lists
+GREASE values are excluded from cipher/extension/curve lists
 before hashing, since they're randomized per-connection noise, not a
 real signal of client identity.
 """
