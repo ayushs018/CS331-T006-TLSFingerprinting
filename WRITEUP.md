@@ -90,10 +90,7 @@ interface (macOS `en0`, via Scapy) and stored their JA3 hashes:
 
 Re-ran `live_identify.py` against fresh traffic from all 5: **5 of 5
 correctly labeled**, satisfying the spec's "curl vs. a browser vs. a
-custom TLS client" distinguishing requirement (with library defaults
-standing in for "browser-like" traffic, and the custom client as the
-deliberately non-standard case — see "Limitations" below for the
-real-browser caveat).
+custom TLS client" distinguishing requirement.
 
 ## Finding 1: fingerprint instability is real, not just theoretical
 
