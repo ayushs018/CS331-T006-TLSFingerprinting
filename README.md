@@ -79,32 +79,6 @@ every platform — a small but genuine version of the same
 "fingerprint randomization" phenomenon documented as a browser evasion
 technique below, worth mentioning in the write-up.
 
-## Tests
-
-```bash
-for f in tests/test_*.py; do python3 "$f"; done
-```
-
-11/11 passing. Validates the JA3/JA3S string format, GREASE stripping,
-byte parser, and similarity matcher against independently-computed
-values — plus, critically, two test vectors taken directly from the
-[original Salesforce JA3 README](https://github.com/salesforce/ja3)
-(the algorithm's own published specification), run through our actual
-`ja3_string_from_fields`/`hash_string` functions and matched exactly.
-This closes the "validated against published reference JA3 hashes"
-requirement with a genuine external source, not just our own
-hand-computed values. See [WRITEUP.md](WRITEUP.md) for the full
-comparison table.
-
-## Roadmap status
-
-- [x] Phase 1 — passive capture (`capture/sniffer.py`)
-- [x] Phase 2 — JA3/JA3S implementation (`ja3/`), unit-validated + externally validated against published Salesforce JA3 test vectors
-- [x] Phase 3 — reference DB wiring (`db/store.py`, `scripts/populate_db.py`)
-- [x] Phase 4 — live demo across 5 real clients, verified working (see above)
-- [ ] Phase 5 (stretch) — JA4/JA4S, eBPF/XDP capture path
-- [x] Phase 6 — write-up: see [WRITEUP.md](WRITEUP.md), including validation
-      results and two firsthand fingerprint-instability findings
 
 ## Known limitation
 
