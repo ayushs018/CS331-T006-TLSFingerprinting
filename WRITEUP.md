@@ -8,12 +8,11 @@ stack, a deliberately custom-configured client — purely from the shape
 of its unencrypted `ClientHello`, with no decryption and no MITM. The
 core JA3/JA3S algorithm, the byte-level TLS parser, and a
 similarity-based fallback matcher were all implemented from scratch and
-verified with 11 unit tests — including two vectors taken directly from
+verified with two vectors taken directly from
 the original Salesforce JA3 README, the algorithm's own published
 specification — plus live packet capture against 5 real clients on
 real network traffic. Along the way we found and documented two genuine
-instances of fingerprint instability — not staged for the write-up, but
-discovered while building the demo — which turned out to be the most
+instances of fingerprint instability discovered while building the demo — which turned out to be the most
 substantive finding in this project.
 
 ## Background: why this matters
@@ -55,19 +54,6 @@ on what we validated and what we found, not the implementation itself.
 
 ## Validation
 
-### Unit tests: 11/11 passing
-
-Every expected value in the test suite was computed independently
-(hand-verified MD5s, hand-computed similarity scores) before being
-hardcoded — these are spec-conformance checks, not "assert whatever the
-code currently outputs":
-
-- `test_ja3.py` (6 tests): JA3/JA3S string formatting, GREASE stripping,
-  and byte-level parser correctness against a hand-packed synthetic
-  `ClientHello`.
-- `test_match.py` (5 tests): the similarity-fallback matcher (see
-  "The fuzzy-matching investigation" below).
-
 ### External validation: matches the algorithm's own published test vectors
 
 The spec explicitly requires validation "against published reference
@@ -88,8 +74,6 @@ separately — and matched exactly, including the edge case of a
 |---|---|---|---|
 | `769,47-53-...-19-4,0-10-11,23-24-25,0` | `ada70206e40642a3e4461f35503241d5` | `ada70206e40642a3e4461f35503241d5` | ✅ |
 | `769,4-5-10-9-100-98-3-6-19-18-99,,,` | `de350869b8c85de67a350c8d186f11e6` | `de350869b8c85de67a350c8d186f11e6` | ✅ |
-
-Both are now permanent regression tests (`test_ja3_matches_official_salesforce_readme_vector`, `test_ja3_matches_official_readme_vector_with_no_extensions`).
 
 ### Live demo: 5 distinct real clients, correctly identified
 
@@ -147,42 +131,19 @@ identifies a client whose fingerprint changed by one cipher suite out
 of four (82% similarity, correctly matched, threshold 70%).
 
 **Large, real drift (the actual curl case above): does not work
-reliably**, tested two ways:
-
-| Method | Real curl scored | Best (wrong) match |
-|---|---|---|
-| Set-based (Jaccard, order-ignored) | 49.4% | `python-urllib` at 52.4% |
-| Order-aware (sequence similarity) | 12.9% (lowest of all 5!) | `python-urllib` at 40.0% |
-
-Neither heuristic reliably attributed the old curl capture back to
-"curl" — the two real curl variants differ enough (13 vs. 49 cipher
-suites, different relative ordering even among shared entries) that
-generic similarity measures aren't sufficient signal. This is not a bug
-in the matcher; it's a genuine finding about the limits of the
-approach at this scale of drift.
+reliably**
 
 **Conclusion**: similarity matching is a useful *hint* for small drift,
 clearly surfaced as such in `live_identify.py` (prefixed `~`, with a
 score, never presented as equivalent to an exact match) — but the only
 fully reliable strategy for large drift is curation: store every
-legitimately observed variant per client over time. This mirrors how
-production JA3 databases (e.g. ja3er.com, vendor threat-intel feeds)
-actually operate — they maintain large sets of known hashes per client
-identity, not one canonical hash.
+legitimately observed variant per client over time.
 
 ## Limitations
 
 - **GREASE values** (RFC 8701) are deliberately randomized by
   TLS-ossification-resistant clients and are stripped before hashing —
   without this, no client would ever produce a stable hash at all.
-- **Deliberate browser randomization.** Modern Chrome and Firefox
-  intentionally randomize extension order in some circumstances,
-  specifically to defeat fingerprinting like JA3. We didn't capture a
-  real browser in this exercise (our capture tooling only sees traffic
-  on this machine's local interface, and the available browser
-  automation runs remotely), so this is documented from established
-  public knowledge about JA3 rather than something we independently
-  reproduced — a clearly-labeled gap, not a claim we verified ourselves.
 - **Single-segment assumption.** The TCP-layer capture assumes a
   `ClientHello`/`ServerHello` fits in one TCP segment — true for the
   large majority of real handshakes, but a heavily-padded one (e.g. ECH)
