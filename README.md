@@ -1,5 +1,20 @@
 # TLS Fingerprinting (JA3 / JA3S)
 
+Team ID	- T006
+Project ID - 11
+Project Title - TLS Fingerprinting
+
+Team Members
+Name	                              Roll Number
+Kshatriya Anujsingh Vinodsingh	    23110173
+Sanskar Prajapati	                  23110290
+Ankit Kumar	                        23110030
+Sabane Ayush Datta	                23110054
+Ashutosh Sahu	                      23110050
+Raj Kumar Gupta	                    23110267
+
+
+
 Passively capture TLS handshakes, compute JA3/JA3S fingerprints, and
 identify clients (curl, browsers, custom scripts) purely from their
 handshake — no payload decryption needed.
